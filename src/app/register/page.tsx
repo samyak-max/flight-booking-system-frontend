@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { setAuthData } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import { authAPI } from "@/lib/api";
 import Link from "next/link";
 
-export default function Home() {
-  const [data, setData] = useState({ email: "", password: "" });
+export default function RegisterPage() {
+  const [data, setData] = useState({ email: "", password: "", confirmPassword: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -17,32 +18,26 @@ export default function Home() {
     setLoading(true);
     setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    // Validate passwords match
+    if (data.password !== data.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
-      if (response.ok) {
-        const result = await response.json();
-        
-        // Store authentication data
-        setAuthData(result.user, result.session);
-        
-        // Refresh user context
-        refreshUser();
-        
-        // Redirect to dashboard
-        router.push("/dashboard");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
+    try {
+      const result = await authAPI.register(data.email, data.password);
+      
+      // Store authentication data
+      setAuthData(result.user, result.session);
+      
+      // Refresh user context
+      refreshUser();
+      
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -54,10 +49,12 @@ export default function Home() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-[#2b2b3c] p-8 rounded-2xl shadow-xl space-y-6"
       >
-        <h2 className="text-2xl font-semibold text-center">Welcome back</h2>
-        <p className="text-sm text-gray-400 text-center">
-          Sign in to continue to your dashboard
-        </p>
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold">Create Account</h2>
+          <p className="text-sm text-gray-400 mt-2">
+            Sign up to book flights and manage your travel
+          </p>
+        </div>
 
         {error && (
           <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
@@ -95,23 +92,38 @@ export default function Home() {
           />
         </div>
 
+        <div className="space-y-2">
+          <label htmlFor="confirmPassword" className="block text-sm text-gray-300">
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            className="w-full px-4 py-2 bg-[#1e1e2f] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            value={data.confirmPassword}
+            onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
+            required
+          />
+        </div>
+
         <button
           type="submit"
           disabled={loading}
           className="w-full py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Signing in..." : "Log In"}
+          {loading ? "Creating Account..." : "Create Account"}
         </button>
 
         <div className="text-center">
           <p className="text-sm text-gray-400">
-            Don't have an account?{" "}
-            <Link href="/register" className="text-green-500 hover:text-green-400">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/" className="text-green-500 hover:text-green-400">
+              Sign in
             </Link>
           </p>
         </div>
       </form>
     </div>
   );
-}
+} 
