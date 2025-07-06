@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { setAuthData } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_CONFIG } from "@/lib/config";
 import Link from "next/link";
 
 export default function Home() {
@@ -18,7 +19,7 @@ export default function Home() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/auth/login", {
+      const response = await fetch(`${API_CONFIG.baseURL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

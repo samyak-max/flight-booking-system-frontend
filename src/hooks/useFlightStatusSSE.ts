@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getToken } from '@/lib/auth';
 import { FlightStatus } from '@/types';
+import { API_CONFIG } from '@/lib/config';
 
 interface SSEFlightUpdate {
   flightId: string;
@@ -51,7 +52,7 @@ export const useFlightStatusSSE = (flightId?: string) => {
       }
 
       // Use the existing SSE endpoint for specific flight updates
-      const url = `http://localhost:5000/flight-status/updates/${flightId}?token=${encodeURIComponent(token)}`;
+      const url = `${API_CONFIG.baseURL}/flight-status/updates/${flightId}?token=${encodeURIComponent(token)}`;
       const eventSource = new EventSource(url);
 
       eventSourceRef.current = eventSource;
@@ -190,7 +191,7 @@ export const useAllFlightStatusSSE = () => {
       }
 
       // Use the existing SSE endpoint for all flight updates
-      const url = `http://localhost:5000/flight-status/updates?token=${encodeURIComponent(token)}`;
+      const url = `${API_CONFIG.baseURL}/flight-status/updates?token=${encodeURIComponent(token)}`;
       const eventSource = new EventSource(url);
 
       eventSourceRef.current = eventSource;

@@ -63,13 +63,15 @@ export const getAuthHeaders = (): Record<string, string> => {
   };
 };
 
+import { API_CONFIG } from './config';
+
 export const apiRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> => {
   const token = getToken();
   
-  const response = await fetch(`http://localhost:5000${endpoint}`, {
+  const response = await fetch(`${API_CONFIG.baseURL}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
