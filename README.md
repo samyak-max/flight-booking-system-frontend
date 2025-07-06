@@ -38,8 +38,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 Create a `.env.local` file in the root directory:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-NEXT_PUBLIC_BACKEND_URL=https://your-backend-url.railway.app
+NEXT_PUBLIC_API_URL=https://your-backend-url.railway.app
 ```
 
 ## 📱 Features
